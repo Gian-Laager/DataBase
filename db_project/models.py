@@ -92,6 +92,7 @@ class ResultType:
         return ResultType(None, type, Unit.get(unit))
 
     def insert(self):
+        ResultType.init()
         with connection.cursor() as cursor:
             cursor.execute(f"INSERT INTO ResultType (result_type, unit) VALUES ('{self.result_type}', {self.unit.id})")
 
@@ -138,6 +139,7 @@ class Unit:
         return Unit(None, unit)
 
     def insert(self):
+        Unit.init()
         with connection.cursor() as cursor:
             cursor.execute(f"INSERT INTO Unit(unit) VALUES ('{self.unit}')")
 
@@ -190,6 +192,7 @@ class MeasurementType:
         return MeasurementType(None, Unit.get(unit), type)
 
     def insert(self):
+        MeasurementType.init()
         with connection.cursor() as cursor:
             cursor.execute(f"INSERT INTO MeasurementType (`type`, unit) VALUES ('{self.type}', {self.unit.id})")
 
@@ -249,6 +252,7 @@ class Measurement:
         return Measurement(None, bunch, type, measurement, timestamp)
 
     def insert(self):
+        Measurement.init()
         with connection.cursor() as cursor:
             print(self.timestamp)
             cursor.execute(f"INSERT "
@@ -332,6 +336,7 @@ class Result:
         return Result(None, measurement_bunch, type, timestamp, name, comment, result)
 
     def insert(self):
+        Result.init()
         with connection.cursor() as cursor:
             cursor.execute(f"INSERT "
                            f"INTO "
