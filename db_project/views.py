@@ -14,7 +14,8 @@ def toHtml(obj):
 
 
 def index(request):
-    return HttpResponse(toHtml(Result.getAll()))
+    return HttpResponse(toHtml(
+        Result.getAll()) + '<br><a href="/form">add new results</a><br><a href="/get">get result with id (add id "/get/*id*")</a>')
 
 
 def get(request):
