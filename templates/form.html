@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+
+    <script>
+        let numberOfMeasurements = 0;
+
+        function addMeasurement() {
+            numberOfMeasurements++;
+            let lastMeasurement = document.getElementById("measurement-list");
+            lastMeasurement = lastMeasurement.children[lastMeasurement.children.length - 2]
+            lastMeasurement.insertAdjacentHTML("afterend", `<br><li id="measurement-${numberOfMeasurements}"> \
+                <label for="m-${numberOfMeasurements}-type"> \
+                    type \
+                </label> \
+                <input type="number" id="m-${numberOfMeasurements}-type"><br> \
+ \
+                    <label for="m-${numberOfMeasurements}-measurement"> \
+                        measurement \
+                    </label> \
+                    <input type="number" id="m-${numberOfMeasurements}-measurement"><br> \
+ \
+                        <label for="m-${numberOfMeasurements}-timestamp"> \
+                            time \
+                        </label> \
+                        <input type="date" id="m-${numberOfMeasurements}-timestamp"><br> \
+            </li>`);
+        }
+
+        class Measurement {
+            type;
+            measurement;
+            timestamp;
+        }
+
+        class Result {
+            measurements;
+            type;
+            timestamp;
+            name;
+            comment;
+            result;
+        }
+
+        function submitResult(event) {
+            event.preventDefault()
+            let measurements = []
+            for (let i = 0; i < numberOfMeasurements; i++) {
+                let currMeas = new Measurement();
+                currMeas.type = document.getElementById(`m-${i}-type`).value;
+                currMeas.measurement = document.getElementById(`m-${i}-measurement`).value;
+                currMeas.timestamp = document.getElementById(`m-${i}-timestamp`).value;
+                measurements.push(currMeas);
+            }
+            let result = new Result()
+            result.measurements = measurements
+            result.type = document.getElementById("result-type").value
+            result.timestamp = document.getElementById("result-time").value
+            result.name = document.getElementById("result-name").value
+            result.comment = document.getElementById("result-comment").value
+            result.result = document.getElementById("result-result").value
+
+            fetch("/form/result", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': `${document.getElementsByName("csrfmiddlewaretoken")[0].value}`
+                },
+                body: JSON.stringify(result)
+            }).catch((err) => {
+                console.error(err.message)
+            });
+        }
+
+        function submitUnit(event) {
+            event.preventDefault();
+
+            fetch("/form/unit", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': `${document.getElementsByName("csrfmiddlewaretoken")[0].value}`
+                },
+                body: JSON.stringify({
+                    unit: document.getElementById("unit").value
+                })
+            }).catch((err) => {
+                console.error(err.message)
+            });
+        }
+
+        function submitResultType(event) {
+            event.preventDefault();
+
+            fetch("/form/result_type", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': `${document.getElementsByName("csrfmiddlewaretoken")[0].value}`
+                },
+                body: JSON.stringify({
+                    type: document.getElementById("result-type-type").value,
+                    unit: document.getElementById("result-type-unit").value
+                })
+            }).catch((err) => {
+                console.error(err.message)
+            });
+        }
+
+        function submitMeasurementType(event) {
+            event.preventDefault();
+
+            fetch("/form/measurement_type", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': `${document.getElementsByName("csrfmiddlewaretoken")[0].value}`
+                },
+                body: JSON.stringify({
+                    type: document.getElementById("measurement-type").value,
+                    unit: document.getElementById("measurement-unit").value
+                })
+            }).catch((err) => {
+                console.error(err.message)
+            });
+        }
+    </script>
+</head>
+<body>
+<h2>Add result</h2>
+<form method="post">{% csrf_token %}
+    <h3>Measurements</h3>
+    <ul id="measurement-list">
+        <li id="measurement-0">
+            <label for="m-0-type">
+                type
+            </label>
+            <input type="number" value="0" id="m-0-type"><br>
+
+            <label for="m-0-measurement">
+                measurement
+            </label>
+            <input type="number" value="0" id="m-0-measurement"><br>
+
+            <label for="m-0-timestamp">
+                time
+            </label>
+            <input type="date" value="0" id="m-0-timestamp"><br>
+        </li>
+        <li>
+            <br>
+            <button onclick="addMeasurement()" type="button">add new measurement</button>
+        </li>
+    </ul>
+    <label for="result-type">
+        type
+    </label>
+    <input type="number" value="0" id="result-type"><br>
+
+    <label for="result-time">
+        time
+    </label>
+    <input type="date" value="0" id="result-time"><br>
+    <label for="result-name">
+        name
+    </label>
+    <input type="text" value="0" id="result-name"><br>
+    <label for="result-comment">
+        comment
+    </label>
+    <input type="text" value="0" id="result-comment"><br>
+    <label for="result-result">
+        result
+    </label>
+    <input type="number" value="0" id="result-result"><br>
+    <button type="submit" onclick="submitResult(event)">submit</button>
+</form>
+<h2>Add result type</h2>
+<form method="post">{% csrf_token %}
+    <label for="result-type-type">
+        result type
+    </label>
+    <input type="text" id="result-type-type"><br>
+
+    <label for="result-type-unit">
+        unit
+    </label>
+    <input type="number" id="result-type-unit"><br>
+    <button type="submit" onclick="submitResultType(event)">submit</button>
+</form>
+
+<h2>Add measurement type</h2>
+<form>{% csrf_token %}
+    <label for="measurement-type">
+        measurement type
+    </label>
+    <input type="text" id="measurement-type"><br>
+
+    <label for="measurement-unit">
+        unit
+    </label>
+    <input type="number" id="measurement-unit"><br>
+    <button type="submit" onclick="submitMeasurementType(event)">submit</button>
+</form>
+<h2>Add unit</h2>
+<form method="post">{% csrf_token %}
+    <label for="unit">
+        unit
+    </label>
+    <input type="text" id="unit"><br>
+    <button type="submit" onclick="submitUnit(event)">submit</button>
+</form>
+<br>
+<a href="/">Show all results</a><br>
+<a href="/get">get result with id (add id "/get/*id*")</a>
+</body>
+</html>
